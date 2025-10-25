@@ -11,6 +11,7 @@ private:
     int weightClass;
     int age;
     string breed;
+    int mealsPerDay;
 public:
     Pet(int weightClass, int age, string breed);
     ~Pet();
@@ -20,6 +21,8 @@ public:
     int getAge() const;
     void setAge(int age);
     string getBreed() const;
+    int getMealsPerDay() const;
+    void setMealsPerDay(int mealsPerDay);
 };
 
 Pet::Pet(int weightClass, int age, string breed)
