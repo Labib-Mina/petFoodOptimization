@@ -9,7 +9,7 @@ Cat::Cat(int weightClass, int age, string breed) : Pet(weightClass, age, breed)
 
 }
 
-    Cat::~Cat()
+Cat::~Cat()
 {
 }
 
