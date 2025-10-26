@@ -7,8 +7,6 @@ Once the pet profile is entered, the software displays a detailed summary of the
 
 The interface features user-friendly input fields, optional dark mode support, and real-time calculations for adjusting fat and protein levels. Designed for clarity and accessibility, this program combines data-driven analysis with a simple GUI to help pet owners make informed feeding decisions.
 
-##Visual Preview / Banner
-
 ## ✨ Features  
 - 🐕 **User-centric design**  
 - 🧩 **Visually simplistic GUI interface**  
