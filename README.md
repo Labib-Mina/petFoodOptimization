@@ -25,10 +25,9 @@ Usage Example / Demo
 
 <img src="https://github.com/user-attachments/assets/bea4c3ed-771d-4992-94c9-eb6ac33ccfd5" alt="Pet Food Optimizer demo" width="400">
 
-<img src="https://github.com/user-attachments/assets/bea4c3ed-771d-4992-94c9-eb6ac33ccfd5" alt="Pet Food Optimizer demo" width="400">
+Project Structure<img src="https://github.com/user-attachments/assets/562b3444-285f-4353-946e-fe83a24a68f2" alt="Project Structure Screenshot" width="400">
 
 
-Project Structure
 -vibe coding and c++
 
 Future Improvements / Roadmap
