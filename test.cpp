@@ -34,9 +34,23 @@ private:
 
     // Theme helpers
     void ApplyTheme(wxWindow* win, bool dark);
-    wxColour GetBgColor(bool dark) { return dark ? wxColour(30, 30, 30) : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW); }
-    wxColour GetFgColor(bool dark) { return dark ? wxColour(220, 220, 220) : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT); }
-    wxColour GetCtrlBgColor(bool dark) { return dark ? wxColour(50, 50, 50) : wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW); }
+    wxColour GetBgColor(bool dark) { return dark ? wxColour(30, 30, 46) : wxColour(248, 249, 250); } // #1e1e2e / #f8f9fa
+    wxColour GetFgColor(bool dark) { return dark ? wxColour(240, 240, 255) : wxColour(30, 30, 40); } // light text / dark text
+    wxColour GetCtrlBgColor(bool dark) { return dark ? wxColour(45, 45, 65) : wxColour(255, 255, 255); } // input bg
+    wxColour GetAccentColor(bool dark) { return dark ? wxColour(44, 106, 181) : wxColour(93, 156, 236); } // #2c6ab5 / #5d9cec
+    wxColour GetSecondaryAccent() { return wxColour(114, 9, 183); } // purple #7209b7
+    wxColour GetHeaderColor(bool dark) { return dark ? wxColour(40, 40, 60) : wxColour(230, 230, 240); } // subtle header
+
+    wxFont GetAppFont() {
+        wxFont font = wxFont(11, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Cascadia Code");
+        if (!font.IsOk()) {
+            font = wxFont(11, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
+        }
+        if (!font.IsOk()) {
+            font = wxFont(11, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Courier New");
+        }
+        return font;
+    }
 
     // Dialog helpers
     void ShowResultDialog(const wxString& title, const wxString& message);
@@ -51,50 +65,79 @@ bool MyApp::OnInit() {
     return true;
 }
 
-MyFrame::MyFrame() : wxFrame(NULL, wxID_ANY, "Pet Food Optimizer", wxDefaultPosition, wxSize(520, 450)) {
+MyFrame::MyFrame()
+    : wxFrame(NULL, wxID_ANY, "Pet Food Optimizer", wxDefaultPosition, wxSize(640, 580),
+              wxDEFAULT_FRAME_STYLE | wxRESIZE_BORDER) {
     wxPanel* panel = new wxPanel(this);
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
 
-    // -------------------- Pet Info --------------------
-    wxStaticBoxSizer* petSizer = new wxStaticBoxSizer(wxVERTICAL, panel, "Pet Information");
-    petSizer->Add(new wxStaticText(panel, wxID_ANY, "Weight Class:"), 0, wxALL, 5);
-    weightClassChoice = new wxChoice(panel, wxID_ANY);
+    // -------------------- Pet Info Header --------------------
+    wxPanel* headerPanel = new wxPanel(panel, wxID_ANY);
+    headerPanel->SetBackgroundColour(GetHeaderColor(m_darkMode));
+    wxStaticText* headerLabel = new wxStaticText(headerPanel, wxID_ANY, "Pet Information");
+    headerLabel->SetForegroundColour(GetFgColor(m_darkMode));
+    headerLabel->SetFont(GetAppFont().Bold());
+
+    wxBoxSizer* headerSizer = new wxBoxSizer(wxHORIZONTAL);
+    headerSizer->AddSpacer(12);
+    headerSizer->Add(headerLabel, 0, wxALIGN_CENTER_VERTICAL);
+    headerSizer->AddSpacer(12);
+    headerPanel->SetSizer(headerSizer);
+
+    sizer->Add(headerPanel, 0, wxEXPAND | wxTOP | wxLEFT | wxRIGHT, 12);
+
+    // -------------------- Pet Info Fields --------------------
+    wxPanel* petPanel = new wxPanel(panel, wxID_ANY);
+    petPanel->SetBackgroundColour(GetBgColor(m_darkMode));
+    wxBoxSizer* petSizer = new wxBoxSizer(wxVERTICAL);
+
+    auto AddLabeledControl = [&](const wxString& label, wxWindow* ctrl) {
+        // Label ABOVE the control
+        wxStaticText* lbl = new wxStaticText(petPanel, wxID_ANY, label + ":");
+        lbl->SetForegroundColour(GetFgColor(m_darkMode));
+        lbl->SetFont(GetAppFont().Bold()); // Optional: bold labels
+
+        petSizer->Add(lbl, 0, wxLEFT | wxTOP | wxRIGHT, 10);
+        petSizer->Add(ctrl, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, 8);
+    };
+
+    weightClassChoice = new wxChoice(petPanel, wxID_ANY);
     weightClassChoice->Append("Small (1)");
     weightClassChoice->Append("Medium (2)");
     weightClassChoice->Append("Large (3)");
     weightClassChoice->SetSelection(0);
-    petSizer->Add(weightClassChoice, 0, wxEXPAND | wxALL, 5);
+    AddLabeledControl("Weight Class", weightClassChoice);
 
-    petSizer->Add(new wxStaticText(panel, wxID_ANY, "Age:"), 0, wxALL, 5);
-    ageInput = new wxTextCtrl(panel, wxID_ANY);
-    petSizer->Add(ageInput, 0, wxEXPAND | wxALL, 5);
+    ageInput = new wxTextCtrl(petPanel, wxID_ANY);
+    AddLabeledControl("Age", ageInput);
 
-    petSizer->Add(new wxStaticText(panel, wxID_ANY, "Breed:"), 0, wxALL, 5);
-    breedInput = new wxTextCtrl(panel, wxID_ANY);
-    petSizer->Add(breedInput, 0, wxEXPAND | wxALL, 5);
+    breedInput = new wxTextCtrl(petPanel, wxID_ANY);
+    AddLabeledControl("Breed", breedInput);
 
-    petSizer->Add(new wxStaticText(panel, wxID_ANY, "Meals per day:"), 0, wxALL, 5);
-    mealsInput = new wxTextCtrl(panel, wxID_ANY);
-    petSizer->Add(mealsInput, 0, wxEXPAND | wxALL, 5);
+    mealsInput = new wxTextCtrl(petPanel, wxID_ANY);
+    AddLabeledControl("Meals per day", mealsInput);
 
-    sizer->Add(petSizer, 0, wxEXPAND | wxALL, 10);
+    petPanel->SetSizer(petSizer);
+    sizer->Add(petPanel, 0, wxEXPAND | wxALL, 12);
 
     // -------------------- Dark Mode Toggle --------------------
-    darkModeCheckbox = new wxCheckBox(panel, wxID_ANY, "Dark Mode");
-    sizer->Add(darkModeCheckbox, 0, wxALIGN_LEFT | wxLEFT | wxRIGHT | wxBOTTOM, 15);
+    darkModeCheckbox = new wxCheckBox(panel, wxID_ANY, "Enable Dark Mode");
+    sizer->Add(darkModeCheckbox, 0, wxALIGN_LEFT | wxLEFT | wxRIGHT | wxBOTTOM, 20);
     darkModeCheckbox->Bind(wxEVT_CHECKBOX, &MyFrame::OnDarkModeToggle, this);
 
     wxButton* startButton = new wxButton(panel, wxID_ANY, "Start Calculation");
-    sizer->Add(startButton, 0, wxALIGN_CENTER | wxALL, 10);
+    sizer->Add(startButton, 0, wxALIGN_CENTER | wxALL, 16);
 
     panel->SetSizer(sizer);
+
     ApplyTheme(panel, m_darkMode);
     startButton->Bind(wxEVT_BUTTON, &MyFrame::OnStartButton, this);
+
+    this->SetMinSize(wxSize(520, 520)); // Slightly taller for vertical layout
 }
 
 void MyFrame::OnDarkModeToggle(wxCommandEvent& event) {
     m_darkMode = darkModeCheckbox->GetValue();
-    // Re-apply theme to main panel
     wxPanel* panel = dynamic_cast<wxPanel*>(GetChildren()[0]);
     if (panel) ApplyTheme(panel, m_darkMode);
 }
@@ -102,21 +145,45 @@ void MyFrame::OnDarkModeToggle(wxCommandEvent& event) {
 void MyFrame::ApplyTheme(wxWindow* win, bool dark) {
     win->SetBackgroundColour(GetBgColor(dark));
     win->SetForegroundColour(GetFgColor(dark));
+    win->SetFont(GetAppFont());
 
-    // Recursively apply to children
+    // Style controls
+    if (win->IsKindOf(CLASSINFO(wxTextCtrl))) {
+        win->SetBackgroundColour(GetCtrlBgColor(dark));
+        win->SetForegroundColour(GetFgColor(dark));
+    }
+    else if (win->IsKindOf(CLASSINFO(wxChoice))) {
+        win->SetBackgroundColour(GetCtrlBgColor(dark));
+        win->SetForegroundColour(GetFgColor(dark));
+    }
+    else if (win->IsKindOf(CLASSINFO(wxButton))) {
+        win->SetBackgroundColour(GetAccentColor(dark));
+        win->SetForegroundColour(*wxWHITE);
+        win->SetFont(GetAppFont().Bold());
+    }
+    else if (win->IsKindOf(CLASSINFO(wxCheckBox))) {
+        win->SetForegroundColour(GetFgColor(dark));
+    }
+    else if (win->IsKindOf(CLASSINFO(wxStaticText))) {
+        win->SetForegroundColour(GetFgColor(dark));
+    }
+    else if (win->IsKindOf(CLASSINFO(wxPanel))) {
+        // Special case: header panel
+        if (win == dynamic_cast<wxPanel*>(GetChildren()[0])) {
+            // Skip root panel — we handle children separately
+        }
+        else if (win == dynamic_cast<wxPanel*>(GetChildren()[0]->GetChildren()[0])) {
+            // Header panel
+            win->SetBackgroundColour(GetHeaderColor(dark));
+        }
+    }
+
+    // Recurse into all children
     wxWindowList& children = win->GetChildren();
     for (wxWindow* child : children) {
-        if (child->IsKindOf(CLASSINFO(wxTextCtrl)) ||
-            child->IsKindOf(CLASSINFO(wxStaticText)) ||
-            child->IsKindOf(CLASSINFO(wxChoice))) {
-            child->SetBackgroundColour(GetCtrlBgColor(dark));
-            child->SetForegroundColour(GetFgColor(dark));
-        } else if (child->IsKindOf(CLASSINFO(wxButton)) ||
-                   child->IsKindOf(CLASSINFO(wxCheckBox))) {
-            // Buttons/checkboxes usually auto-adapt, but we can force if needed
-        }
-        child->Refresh();
+        ApplyTheme(child, dark);
     }
+
     win->Refresh();
 }
 
@@ -128,20 +195,26 @@ wxDialog* MyFrame::CreateThemedDialog(const wxString& title, bool resizable) {
 }
 
 void MyFrame::ShowResultDialog(const wxString& title, const wxString& message) {
-    wxDialog* dialog = CreateThemedDialog(title, true); // resizable = true
-    dialog->SetSize(550, 350);
-    dialog->SetMinSize(wxSize(400, 200));
+    wxDialog* dialog = CreateThemedDialog(title, true);
+    dialog->SetSize(580, 380);
+    dialog->SetMinSize(wxSize(420, 220));
 
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
     wxTextCtrl* text = new wxTextCtrl(dialog, wxID_ANY, message,
         wxDefaultPosition, wxDefaultSize,
         wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxVSCROLL);
-    ApplyTheme(text, m_darkMode);
-    sizer->Add(text, 1, wxEXPAND | wxALL, 10);
+
+    text->SetBackgroundColour(GetCtrlBgColor(m_darkMode));
+    text->SetForegroundColour(GetFgColor(m_darkMode));
+    text->SetFont(GetAppFont());
+
+    sizer->Add(text, 1, wxEXPAND | wxALL, 12);
 
     wxButton* okBtn = new wxButton(dialog, wxID_OK, "OK");
-    ApplyTheme(okBtn, m_darkMode);
-    sizer->Add(okBtn, 0, wxALIGN_CENTER | wxALL, 5);
+    okBtn->SetBackgroundColour(GetAccentColor(m_darkMode));
+    okBtn->SetForegroundColour(*wxWHITE);
+    okBtn->SetFont(GetAppFont().Bold());
+    sizer->Add(okBtn, 0, wxALIGN_CENTER | wxBOTTOM, 12);
 
     dialog->SetSizer(sizer);
     dialog->ShowModal();
@@ -150,7 +223,6 @@ void MyFrame::ShowResultDialog(const wxString& title, const wxString& message) {
 
 void MyFrame::OnStartButton(wxCommandEvent& event) {
     try {
-        // --- Step 1: Get Pet Info ---
         int weightClass = weightClassChoice->GetSelection() + 1;
         int age = wxAtoi(ageInput->GetValue()); if (age <= 0) age = 1;
         wxString breedWx = breedInput->GetValue();
@@ -175,27 +247,32 @@ void MyFrame::OnStartButton(wxCommandEvent& event) {
 
         // --- Step 2: Get Initial Product Info ---
         wxDialog* prodDialog = CreateThemedDialog("Enter Initial Product Info");
-        prodDialog->SetSize(400, 200);
+        prodDialog->SetSize(420, 200);
 
         wxBoxSizer* prodSizer = new wxBoxSizer(wxVERTICAL);
         wxTextCtrl* fatInput = new wxTextCtrl(prodDialog, wxID_ANY);
         wxTextCtrl* proteinInput = new wxTextCtrl(prodDialog, wxID_ANY);
-        ApplyTheme(fatInput, m_darkMode);
-        ApplyTheme(proteinInput, m_darkMode);
 
-        prodSizer->Add(new wxStaticText(prodDialog, wxID_ANY, "Fat per meal (g):"), 0, wxALL, 5);
-        prodSizer->Add(fatInput, 0, wxEXPAND | wxALL, 5);
-        prodSizer->Add(new wxStaticText(prodDialog, wxID_ANY, "Protein per meal (g):"), 0, wxALL, 5);
-        prodSizer->Add(proteinInput, 0, wxEXPAND | wxALL, 5);
+        fatInput->SetBackgroundColour(GetCtrlBgColor(m_darkMode));
+        fatInput->SetForegroundColour(GetFgColor(m_darkMode));
+        proteinInput->SetBackgroundColour(GetCtrlBgColor(m_darkMode));
+        proteinInput->SetForegroundColour(GetFgColor(m_darkMode));
+
+        prodSizer->Add(new wxStaticText(prodDialog, wxID_ANY, "Fat per meal (g):"), 0, wxALL, 6);
+        prodSizer->Add(fatInput, 0, wxEXPAND | wxALL, 6);
+        prodSizer->Add(new wxStaticText(prodDialog, wxID_ANY, "Protein per meal (g):"), 0, wxALL, 6);
+        prodSizer->Add(proteinInput, 0, wxEXPAND | wxALL, 6);
 
         wxBoxSizer* btnSizer = new wxBoxSizer(wxHORIZONTAL);
         wxButton* okBtn = new wxButton(prodDialog, wxID_OK, "OK");
         wxButton* cancelBtn = new wxButton(prodDialog, wxID_CANCEL, "Cancel");
-        ApplyTheme(okBtn, m_darkMode);
-        ApplyTheme(cancelBtn, m_darkMode);
-        btnSizer->Add(okBtn, 0, wxALL, 5);
-        btnSizer->Add(cancelBtn, 0, wxALL, 5);
-        prodSizer->Add(btnSizer, 0, wxALIGN_RIGHT | wxALL, 5);
+        okBtn->SetBackgroundColour(GetAccentColor(m_darkMode));
+        okBtn->SetForegroundColour(*wxWHITE);
+        cancelBtn->SetBackgroundColour(GetSecondaryAccent());
+        cancelBtn->SetForegroundColour(*wxWHITE);
+        btnSizer->Add(okBtn, 0, wxRIGHT, 8);
+        btnSizer->Add(cancelBtn, 0);
+        prodSizer->Add(btnSizer, 0, wxALIGN_RIGHT | wxTOP | wxBOTTOM, 10);
 
         prodDialog->SetSizerAndFit(prodSizer);
 
@@ -226,27 +303,32 @@ void MyFrame::OnStartButton(wxCommandEvent& event) {
 
         // --- Step 3: Get Adjusted Product Info ---
         wxDialog* adjustDialog = CreateThemedDialog("Enter Adjusted Product Info");
-        adjustDialog->SetSize(400, 200);
+        adjustDialog->SetSize(420, 200);
 
         wxBoxSizer* adjSizer = new wxBoxSizer(wxVERTICAL);
         wxTextCtrl* newFatInput = new wxTextCtrl(adjustDialog, wxID_ANY, wxString::Format("%.2f", fat));
         wxTextCtrl* newProteinInput = new wxTextCtrl(adjustDialog, wxID_ANY, wxString::Format("%.2f", protein));
-        ApplyTheme(newFatInput, m_darkMode);
-        ApplyTheme(newProteinInput, m_darkMode);
 
-        adjSizer->Add(new wxStaticText(adjustDialog, wxID_ANY, "New Fat per meal (g):"), 0, wxALL, 5);
-        adjSizer->Add(newFatInput, 0, wxEXPAND | wxALL, 5);
-        adjSizer->Add(new wxStaticText(adjustDialog, wxID_ANY, "New Protein per meal (g):"), 0, wxALL, 5);
-        adjSizer->Add(newProteinInput, 0, wxEXPAND | wxALL, 5);
+        newFatInput->SetBackgroundColour(GetCtrlBgColor(m_darkMode));
+        newFatInput->SetForegroundColour(GetFgColor(m_darkMode));
+        newProteinInput->SetBackgroundColour(GetCtrlBgColor(m_darkMode));
+        newProteinInput->SetForegroundColour(GetFgColor(m_darkMode));
+
+        adjSizer->Add(new wxStaticText(adjustDialog, wxID_ANY, "New Fat per meal (g):"), 0, wxALL, 6);
+        adjSizer->Add(newFatInput, 0, wxEXPAND | wxALL, 6);
+        adjSizer->Add(new wxStaticText(adjustDialog, wxID_ANY, "New Protein per meal (g):"), 0, wxALL, 6);
+        adjSizer->Add(newProteinInput, 0, wxEXPAND | wxALL, 6);
 
         wxBoxSizer* adjBtnSizer = new wxBoxSizer(wxHORIZONTAL);
         wxButton* adjOkBtn = new wxButton(adjustDialog, wxID_OK, "OK");
         wxButton* adjCancelBtn = new wxButton(adjustDialog, wxID_CANCEL, "Cancel");
-        ApplyTheme(adjOkBtn, m_darkMode);
-        ApplyTheme(adjCancelBtn, m_darkMode);
-        adjBtnSizer->Add(adjOkBtn, 0, wxALL, 5);
-        adjBtnSizer->Add(adjCancelBtn, 0, wxALL, 5);
-        adjSizer->Add(adjBtnSizer, 0, wxALIGN_RIGHT | wxALL, 5);
+        adjOkBtn->SetBackgroundColour(GetAccentColor(m_darkMode));
+        adjOkBtn->SetForegroundColour(*wxWHITE);
+        adjCancelBtn->SetBackgroundColour(GetSecondaryAccent());
+        adjCancelBtn->SetForegroundColour(*wxWHITE);
+        adjBtnSizer->Add(adjOkBtn, 0, wxRIGHT, 8);
+        adjBtnSizer->Add(adjCancelBtn, 0);
+        adjSizer->Add(adjBtnSizer, 0, wxALIGN_RIGHT | wxTOP | wxBOTTOM, 10);
 
         adjustDialog->SetSizerAndFit(adjSizer);
 
