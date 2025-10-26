@@ -54,6 +54,29 @@ vector<double> Pet::idealDiet()
     }
     return diet;
     */
+    vector<double> standard = {14.5,5.5};
+    if (age < 2.0)
+    {
+        standard.at(0) -= 0.2 * standard.at(0);
+        standard.at(1) -= 0.2 * standard.at(1);
+    }
 
+    else if (age >= 9)
+    {
+        standard.at(0) += 0.2 * standard.at(0);
+        standard.at(1) += 0.2 * standard.at(1);
+    }
 
+    switch (weightClass)
+    {
+        case 1:
+        standard.at(0) -= 0.1 * standard.at(0);
+        standard.at(1) -= 0.1 * standard.at(1);
+        case 3:
+        standard.at(0) += 0.1 * standard.at(0);
+        standard.at(1) += 0.1 * standard.at(1);
+
+    }
+
+    return standard;
 }
