@@ -10,15 +10,6 @@ public:
     Cat(int weightClass, int age, string breed);
     ~Cat();
     vector<double> idealDiet();
-
-    Cat(int weightClass, int age, string breed) : Pet(weightClass, age, breed)
-    {
-
-    }
-
-    ~Cat()
-    {
-    }
     
 };
 
