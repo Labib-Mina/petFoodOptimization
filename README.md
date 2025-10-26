@@ -22,7 +22,11 @@ Tech Stack
 -
 
 Usage Example / Demo
-<img src="https://github.com/user-attachments/assets/bea4c3ed-771d-4992-94c9-eb6ac33ccfd5" alt="Pet Food Optimizer demo" width="600">
+
+<img src="https://github.com/user-attachments/assets/bea4c3ed-771d-4992-94c9-eb6ac33ccfd5" alt="Pet Food Optimizer demo" width="400">
+
+<img src="https://github.com/user-attachments/assets/bea4c3ed-771d-4992-94c9-eb6ac33ccfd5" alt="Pet Food Optimizer demo" width="400">
+
 
 Project Structure
 -vibe coding and c++
