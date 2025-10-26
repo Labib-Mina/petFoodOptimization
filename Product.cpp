@@ -36,5 +36,6 @@ double Product::computeScore(Pet& p)
     balanceScore(percentFat);
     balanceScore(percentProtein);
 
+    if (score < 0) score = 0;
     return score;
 }

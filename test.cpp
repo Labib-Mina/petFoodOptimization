@@ -61,6 +61,14 @@ wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit() {
     MyFrame* frame = new MyFrame();
+    
+    // --- SET APPLICATION ICON ---
+    wxIcon icon;
+    if (icon.LoadFile("cat.ico", wxBITMAP_TYPE_ICO)) {
+        frame->SetIcon(icon);
+    }
+    // If it fails, the app continues without an icon (graceful fallback)
+
     frame->Show(true);
     return true;
 }
