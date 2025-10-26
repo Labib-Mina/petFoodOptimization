@@ -1,10 +1,7 @@
-#ifndef PET_H
-#define PET_H
-
 #include <string>
 #include <vector>
 using namespace std;
-
+    
 class Pet
 {
 private:
@@ -15,9 +12,9 @@ private:
 
 public:
     Pet(int weightClass, int age, string breed);
-    ~Pet();
+    virtual ~Pet();  // make destructor virtual
 
-    vector<double> idealDiet();
+    virtual vector<double> idealDiet(); // <--- make this virtual
 
     int getWeightClass() const;
     void setWeightClass(int weightClass);
@@ -30,5 +27,3 @@ public:
     int getMealsPerDay() const;
     void setMealsPerDay(int mealsPerDay);
 };
-
-#endif
