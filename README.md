@@ -32,7 +32,7 @@ The interface features user-friendly input fields, optional dark mode support, a
 </p>
 
 
-Future Improvements / Roadmap
+## Future Improvements / Roadmap
 
 - 🎨 improved visuals/graphics 
 
