@@ -13,6 +13,10 @@ string Pet::getBreed() const
 {
     return breed;
 }
+int Pet::getMealsPerDay() const
+{
+    return mealsPerDay;
+}
 void Pet::setWeightClass(int weightClass) //setter implementations
 {
     this->weightClass = weightClass;
@@ -21,9 +25,15 @@ void Pet::setAge(int age)
 {
     this->age = age;
 }
+void Pet::setMealsPerDay(int mealsPerDay)
+{
+    this->mealsPerDay = mealsPerDay;
+}
 
+//to be implemented later
 vector<double> Pet::idealDiet()
 {
+    /*
     vector<double> diet;
     //these are default values, edit in a proper function later
     if (weightClass == 1) // small
@@ -43,4 +53,7 @@ vector<double> Pet::idealDiet()
         diet = {80.0, 15.0, 3.0, 1.0, 1.0};
     }
     return diet;
+    */
+
+
 }
